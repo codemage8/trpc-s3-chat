@@ -28,4 +28,12 @@ module.exports = getConfig({
   },
   /** We run eslint as a separate task in CI */
   eslint: { ignoreDuringBuilds: !!process.env.CI },
+
+  // Becareful, not expose server side configuration
+  env: {
+    S3_REGION: env.S3_REGION,
+    S3_BUCKET_NAME: env.S3_BUCKET_NAME,
+    S3_KEY: env.CLIENT_S3_KEY,
+    S3_SECRET_KEY: env.CLIENT_S3_SECRET_KEY,
+  },
 });
