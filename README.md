@@ -36,8 +36,9 @@
   - `CLIENT_S3_KEY`, `CLIENT_S3_SECRET_KEY` : Use credentias with only GetObject (For client side image loading)
 
 ### Commands
-
+- Recommend to use `pnpm`
 ```bash
+pnpm install
 pnpm run dev
 ```
 
