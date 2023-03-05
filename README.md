@@ -2,7 +2,7 @@
 
 ## Test Results
 
-[![Playwright Pagination](actions/workflows/test-pagination.yml/badge.svg)](actions/workflows/test-pagination.yml)
+[![Playwright Pagination](https://github.com/jzl0304/trpc-s3-chat/actions/workflows/test-pagination.yml/badge.svg)](https://github.com/jzl0304/trpc-s3-chat/actions/workflows/test-pagination.yml)
 
 
 ## Features
