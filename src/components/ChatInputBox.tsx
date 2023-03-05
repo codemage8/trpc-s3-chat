@@ -9,26 +9,18 @@ import {
 } from '@mantine/core';
 import { getHotkeyHandler } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import React, { RefObject } from 'react';
+import React from 'react';
 import { CircleX, Paperclip, Send, Trash } from 'tabler-icons-react';
+import { MessageAddRequest, MessageAddResponse } from '~/utils/clientModels';
 import { uploadFile } from '~/utils/upload';
-import { trpc } from '../utils/trpc';
 
 interface Props {
-  scrollViewRef: RefObject<HTMLDivElement>;
+  addMessageHandler: (input: MessageAddRequest) => Promise<MessageAddResponse>;
 }
 
 const ChatInputBox: React.FC<Props> = (props: Props) => {
   const [value, setValue] = React.useState('');
   const [file, setFile] = React.useState<File | null>(null);
-  const utils = trpc.useContext();
-
-  const addMessage = trpc.msg.add.useMutation({
-    async onSuccess() {
-      // When message is succefully added, invalidate the cache
-      await utils.msg.list.invalidate();
-    },
-  });
 
   const onSendMessage = async () => {
     try {
@@ -36,7 +28,7 @@ const ChatInputBox: React.FC<Props> = (props: Props) => {
       setValue('');
       setFile(null);
 
-      const response = await addMessage.mutateAsync({
+      const response = await props.addMessageHandler({
         content: value,
         hasImage: !!file,
       });
@@ -64,14 +56,8 @@ const ChatInputBox: React.FC<Props> = (props: Props) => {
           });
         }
       }
-
-      // Scroll to bottom when user actively sent his message
-      props.scrollViewRef.current?.scrollTo({
-        top: props.scrollViewRef.current.scrollHeight,
-        behavior: 'smooth',
-      });
     } catch (cause) {
-      //
+      // console.log(cause);
     }
   };
 

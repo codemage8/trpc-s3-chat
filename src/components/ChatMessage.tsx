@@ -13,12 +13,12 @@ import React from 'react';
 import { DotsVertical, Trash } from 'tabler-icons-react';
 import type { Message } from '~/utils/clientModels';
 import { checkFileExists, getSignedUrlForDownload } from '~/utils/s3Service';
-import { trpc } from '../utils/trpc';
 
 dayjs.extend(calendar);
 
 export type Props = {
   message: Message;
+  deleteHandler?: () => void;
 };
 
 const ChatMessage: React.FC<Props> = (props: Props) => {
@@ -44,7 +44,6 @@ const ChatMessage: React.FC<Props> = (props: Props) => {
       }
     }
     loadImage().then().catch(console.log);
-    console.log('image has changed');
     return () => {
       if (timeout) {
         clearTimeout(timeout);
@@ -53,21 +52,9 @@ const ChatMessage: React.FC<Props> = (props: Props) => {
   }, [message.image]);
 
   const [hovered, setHovered] = React.useState(false);
-  const utils = trpc.useContext();
 
-  const deleteMessageMut = trpc.msg.del.useMutation({
-    async onSuccess() {
-      // When message is succefully added, invalidate the cache
-      utils.msg.list.invalidate();
-    },
-  });
-
-  const onClickRemoveMessage = async () => {
-    try {
-      await deleteMessageMut.mutateAsync({ id: message.id });
-    } catch (cause) {
-      // cause...
-    }
+  const onClickRemoveMessage = () => {
+    props.deleteHandler?.();
   };
 
   return (

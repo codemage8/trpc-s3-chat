@@ -1,34 +1,52 @@
-'use client';
-
-import React, { Fragment } from 'react';
-import { trpc } from '../utils/trpc';
 import { ScrollArea, Stack } from '@mantine/core';
+import { useIntersection } from '@mantine/hooks';
+import React, { Fragment } from 'react';
+import useAddNewMessage from '~/hooks/useAddNewMessage';
+import useDeleteMessage from '~/hooks/useDeleteMessage';
+import useMessagesQuery from '~/hooks/useMessagesQuery';
 import ChatInputBox from './ChatInputBox';
 import ChatMessage from './ChatMessage';
 
-const ChatRoom = () => {
-  const scrollViewport = React.useRef<HTMLDivElement>(null);
-  const msgQuery = trpc.msg.list.useInfiniteQuery(
-    {
-      limit: 10,
-    },
-    {
-      getPreviousPageParam(lastPage) {
-        return lastPage.nextCursor;
-      },
-      refetchInterval: 5000,
-    },
-  );
+const pageSize = 50;
 
+const ChatRoom = () => {
+  const scrollViewRef = React.useRef<HTMLDivElement>(null);
+  const bottomRef = React.useRef<HTMLDivElement>(null);
+  const [initiallyScrolled, setInitiallyScrolled] = React.useState(false);
+  const msgQuery = useMessagesQuery(pageSize);
+
+  // Define scroll to bottom method
+  const scrollToBottom = React.useCallback(() => {
+    const timeout = setTimeout(() => {
+      bottomRef.current?.scrollIntoView?.({ behavior: 'smooth' });
+      setInitiallyScrolled(true);
+    }, 1000);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, []);
+
+  const intersection = useIntersection<HTMLDivElement>({
+    root: scrollViewRef.current,
+    threshold: 1,
+  });
+
+  // When message status changes, scroll to bottom
   React.useEffect(() => {
     if (msgQuery.status === 'success') {
-      // Scroll to bottom when messages are loaded
-      scrollViewport.current?.scrollTo({
-        top: scrollViewport.current.scrollHeight,
-        behavior: 'smooth',
-      });
+      scrollToBottom();
     }
-  }, [msgQuery.status]);
+  }, [msgQuery.status, scrollToBottom]);
+
+  React.useEffect(() => {
+    // When intersection occurred,
+    if (intersection.entry?.isIntersecting && !msgQuery.isLoading) {
+      msgQuery.fetchPreviousPage();
+    }
+  }, [intersection.entry?.isIntersecting, msgQuery]);
+
+  const addMessageMutation = useAddNewMessage(pageSize, scrollToBottom);
+  const deleteMutation = useDeleteMessage(pageSize);
 
   return (
     <>
@@ -37,28 +55,39 @@ const ChatRoom = () => {
           p="xs"
           scrollbarSize={1}
           sx={{ height: '84vh' }}
-          onScrollPositionChange={({ x, y }) => {
-            if (y == 0) {
-              msgQuery.fetchPreviousPage();
-            }
-          }}
-          viewportRef={scrollViewport}
+          viewportRef={scrollViewRef}
         >
           {
-            <Stack>
+            <Stack spacing={2}>
+              {msgQuery.hasPreviousPage &&
+              !msgQuery.isLoading &&
+              initiallyScrolled ? (
+                <div ref={intersection.ref}></div>
+              ) : null}
               {msgQuery.data?.pages.map((page, index) => {
                 return (
                   <Fragment key={page.items[0]?.id || index}>
                     {page.items.map((msg) => {
-                      return <ChatMessage message={msg} key={msg.id} />;
+                      return (
+                        <ChatMessage
+                          message={msg}
+                          key={msg.id}
+                          deleteHandler={() =>
+                            deleteMutation.mutateAsync({ id: msg.id })
+                          }
+                        />
+                      );
                     })}
                   </Fragment>
                 );
               })}
+              <div ref={bottomRef}></div>
             </Stack>
           }
         </ScrollArea>
-        <ChatInputBox scrollViewRef={scrollViewport} />
+        <ChatInputBox
+          addMessageHandler={(input) => addMessageMutation.mutateAsync(input)}
+        />
       </Stack>
     </>
   );

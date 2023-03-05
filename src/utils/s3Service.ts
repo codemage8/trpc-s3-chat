@@ -13,8 +13,8 @@ export const s3Config = {
 const s3Client = new S3Client({
   region: s3Config.region,
   credentials: {
-    accessKeyId: process.env.S3_KEY!,
-    secretAccessKey: process.env.S3_SECRET_KEY!,
+    accessKeyId: process.env.S3_KEY ?? '',
+    secretAccessKey: process.env.S3_SECRET_KEY ?? '',
   },
 });
 
