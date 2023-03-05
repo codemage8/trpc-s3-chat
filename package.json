@@ -20,7 +20,7 @@
     "migrate": "prisma migrate deploy",
     "test": "run-s test:*",
     "test:unit": "vitest run",
-    "test:e2e": "playwright test",
+    "test:e2e": "NODE_ENV=test playwright test",
     "test-dev": "start-server-and-test dev http://127.0.0.1:3000 test",
     "test-start": "start-server-and-test start http://127.0.0.1:3000 test",
     "postinstall": "prisma generate"
@@ -51,6 +51,7 @@
     "@trpc/server": "^10.13.2",
     "clsx": "^1.1.1",
     "dayjs": "^1.11.7",
+    "dotenv": "^16.0.3",
     "next": "^13.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -77,7 +78,8 @@
     "tsx": "^3.12.3",
     "typescript": "^4.8.3",
     "vite": "^4.1.2",
-    "vitest": "^0.28.5"
+    "vitest": "^0.29.2",
+    "vitest-mock-extended": "^1.0.9"
   },
   "publishConfig": {
     "access": "restricted"

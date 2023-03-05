@@ -32,7 +32,6 @@ yarn-error.log*
 
 # vercel
 .vercel
-
 *.db
 *.db-journal
 
@@ -41,3 +40,4 @@ yarn-error.log*
 playwright/test-results
 
 .env
+.env.*

@@ -7,7 +7,7 @@ import useMessagesQuery from '~/hooks/useMessagesQuery';
 import ChatInputBox from './ChatInputBox';
 import ChatMessage from './ChatMessage';
 
-const pageSize = 50;
+const pageSize = 20;
 
 const ChatRoom = () => {
   const scrollViewRef = React.useRef<HTMLDivElement>(null);
@@ -17,12 +17,17 @@ const ChatRoom = () => {
 
   // Define scroll to bottom method
   const scrollToBottom = React.useCallback(() => {
+    let setScrolledTimeout: NodeJS.Timeout | undefined;
     const timeout = setTimeout(() => {
       bottomRef.current?.scrollIntoView?.({ behavior: 'smooth' });
-      setInitiallyScrolled(true);
-    }, 1000);
+      // After 3 seconds, enable to load more
+      setScrolledTimeout = setTimeout(() => setInitiallyScrolled(true), 3000);
+    }, 300);
     return () => {
       clearTimeout(timeout);
+      if (setScrolledTimeout) {
+        clearTimeout(setScrolledTimeout);
+      }
     };
   }, []);
 
@@ -42,6 +47,8 @@ const ChatRoom = () => {
     // When intersection occurred,
     if (intersection.entry?.isIntersecting && !msgQuery.isLoading) {
       msgQuery.fetchPreviousPage();
+      // Prevent more fetch recursively
+      scrollViewRef.current?.scrollTo({ top: 10 });
     }
   }, [intersection.entry?.isIntersecting, msgQuery]);
 
@@ -61,8 +68,9 @@ const ChatRoom = () => {
             <Stack spacing={2}>
               {msgQuery.hasPreviousPage &&
               !msgQuery.isLoading &&
+              !msgQuery.isFetchingPreviousPage &&
               initiallyScrolled ? (
-                <div ref={intersection.ref}></div>
+                <div ref={intersection.ref} data-testid="div_chat_load_more" />
               ) : null}
               {msgQuery.data?.pages.map((page, index) => {
                 return (
