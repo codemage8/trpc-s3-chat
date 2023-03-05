@@ -32,23 +32,31 @@ const ChatMessage: React.FC<Props> = (props: Props) => {
   );
 
   React.useEffect(() => {
-    let timeout: NodeJS.Timeout;
+    let timeout: number;
+    let totalTries = 0;
+    function cleanupTimeout() {
+      if (timeout) {
+        window.clearTimeout(timeout);
+      }
+    }
     async function loadImage() {
       if (message.image) {
         if (await checkFileExists(message.image)) {
           setImageUrl(await getSignedUrlForDownload(message.image));
+          cleanupTimeout();
         } else {
-          // Try again after a few seconds.
-          timeout = setTimeout(loadImage, 3000);
+          totalTries++;
+          if (totalTries <= 5) {
+            // Try again after a few seconds.
+            timeout = window.setTimeout(loadImage, 3000);
+            return;
+          }
+          cleanupTimeout();
         }
       }
     }
     loadImage().then().catch(console.log);
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-    };
+    return () => cleanupTimeout();
   }, [message.image]);
 
   const [hovered, setHovered] = React.useState(false);

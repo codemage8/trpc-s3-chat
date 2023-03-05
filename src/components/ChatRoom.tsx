@@ -17,16 +17,19 @@ const ChatRoom = () => {
 
   // Define scroll to bottom method
   const scrollToBottom = React.useCallback(() => {
-    let setScrolledTimeout: NodeJS.Timeout | undefined;
-    const timeout = setTimeout(() => {
+    let setScrolledTimeout: number | undefined;
+    const timeout = window.setTimeout(() => {
       bottomRef.current?.scrollIntoView?.({ behavior: 'smooth' });
       // After 3 seconds, enable to load more
-      setScrolledTimeout = setTimeout(() => setInitiallyScrolled(true), 3000);
+      setScrolledTimeout = window.setTimeout(
+        () => setInitiallyScrolled(true),
+        3000,
+      );
     }, 300);
     return () => {
-      clearTimeout(timeout);
+      window.clearTimeout(timeout);
       if (setScrolledTimeout) {
-        clearTimeout(setScrolledTimeout);
+        window.clearTimeout(setScrolledTimeout);
       }
     };
   }, []);
