@@ -1,7 +1,11 @@
-# Prisma + tRPC
+# TRPC+S3 text app
+
+## Test Results
+
+[![Playwright Pagination](actions/workflows/test-pagination.yml/badge.svg)](actions/workflows/test-pagination.yml)
+
 
 ## Features
-
 - 🧙‍♂️ E2E typesafety with [tRPC](https://trpc.io)
 - ⚡ Full-stack React with Next.js
 - ⚡ Database with Prisma
@@ -11,89 +15,37 @@
   - ✅ E2E testing with [Playwright](https://playwright.dev/)
   - ✅ Linting
 - 🔐 Validates your env vars on build and start
+- Uses Amazon S3 Bucket for image storage
+- Uses Mongodb Atlas for message storage
+- Optimistic Update on trpc mutation
+- Mantine for UX
 
 ## Setup
 
-**yarn:**
-
-```bash
-yarn create next-app --example https://github.com/trpc/trpc --example-path examples/next-prisma-starter trpc-prisma-starter
-cd trpc-prisma-starter
-yarn
-yarn dx
-```
-
-**npm:**
-
-```bash
-npx create-next-app --example https://github.com/trpc/trpc --example-path examples/next-prisma-starter trpc-prisma-starter
-cd trpc-prisma-starter
-yarn
-yarn dx
-```
-
 ### Requirements
+  - Node >= 14
+  - Mongodb Atlas
+  - Amazon S3
 
-- Node >= 14
-- Postgres
+### Configuration for Development
 
-## Development
-
-### Start project
-
-```bash
-yarn create next-app --example https://github.com/trpc/trpc --example-path examples/next-prisma-starter trpc-prisma-starter
-cd trpc-prisma-starter
-yarn
-yarn dx
-```
+- copy `sample.env` file and rename to `.env`, fill in the variables.
+  - `DATABASE_URL` : Connection url to mongodb atlas db
+  - `S3_REGION`, `S3_BUCKET_NAME`
+  - `S3_KEY`, `S3_SECRET_KEY`, `S3_BUCKET_NAME` : Use access keys & secrets with PutObject permission granted to the bucket
+  - `CLIENT_S3_KEY`, `CLIENT_S3_SECRET_KEY` : Use credentias with only GetObject (For client side image loading)
 
 ### Commands
 
 ```bash
-yarn build      # runs `prisma generate` + `prisma migrate` + `next build`
-yarn db-reset   # resets local db
-yarn dev        # starts next.js
-yarn dx         # starts postgres db + runs migrations + seeds + starts next.js
-yarn test-dev   # runs e2e tests on dev
-yarn test-start # runs e2e tests on `next start` - build required before
-yarn test:unit  # runs normal Vitest unit tests
-yarn test:e2e   # runs e2e tests
+pnpm run dev
 ```
 
-## Deployment
+### Github workflow
 
-### Using [Render](https://render.com/)
+- Open`.github/workflows/test-pagination.yml`, update the environment variables, some variables are stored as repository secret for privacy
 
-The project contains a [`render.yaml`](./render.yaml) [_"Blueprint"_](https://render.com/docs/blueprint-spec) which makes the project easily deployable on [Render](https://render.com/).
 
-Go to [dashboard.render.com/blueprints](https://dashboard.render.com/blueprints) and connect to this Blueprint and see how the app and database automatically gets deployed.
-
-## Files of note
-
-<table>
-  <thead>
-    <tr>
-      <th>Path</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><a href="./prisma/schema.prisma"><code>./prisma/schema.prisma</code></a></td>
-      <td>Prisma schema</td>
-    </tr>
-    <tr>
-      <td><a href="./src/pages/api/trpc/[trpc].ts"><code>./src/pages/api/trpc/[trpc].ts</code></a></td>
-      <td>tRPC response handler</td>
-    </tr>
-    <tr>
-      <td><a href="./src/server/routers"><code>./src/server/routers</code></a></td>
-      <td>Your app's different tRPC-routers</td>
-    </tr>
-  </tbody>
-</table>
-
----
-
-Created by [@alexdotjs](https://twitter.com/alexdotjs).
+### Deployment
+- Use Vercel
+- Make sure to assign environment variables in `.env` file, since `.env` file is not used for production deployment 
