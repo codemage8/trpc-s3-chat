@@ -51,3 +51,4 @@ pnpm run dev
 - Use Vercel
 - Make sure to assign environment variables in `.env` file, since `.env` file is not used for production deployment 
 - Ignore md test
+- Another md update
