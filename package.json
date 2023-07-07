@@ -12,7 +12,7 @@
     "dx": "run-p dx:* --print-label",
     "dev": "pnpm dx:next",
     "prebuild": "run-s generate migrate",
-    "build": "git status --short && next build",
+    "build": "git status --short && cat vercel.json && next build",
     "start": "next start",
     "lint": "eslint --ext \".js,.ts,.tsx\" --report-unused-disable-directives --report-unused-disable-directives src",
     "lint-fix": "pnpm lint --fix",
