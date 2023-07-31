@@ -1,3 +1,3 @@
 {
-  "ignoreCommand": "git diff --quiet HEAD~1 HEAD \":(exclude)*.md\" || (exit_code=$?; [ $exit_code -neq 0 ] && exit 1 || exit $exit_code)"
+  "ignoreCommand": "git diff --quiet HEAD~1 HEAD \":(exclude)*.md\" || (exit_code=$?; [ $exit_code -ne 0 ] && exit 1 || exit $exit_code)"
 }
